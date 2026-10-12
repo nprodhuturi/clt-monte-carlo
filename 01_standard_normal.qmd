@@ -1,5 +1,5 @@
 ---
-title: "CLT Project 01: Standard Normal"
+title: "CLT Distribution 01: Standard Normal"
 format:
   gfm:
     fig-width: 10
@@ -63,7 +63,7 @@ show$passes <- ifelse(results$good[results$n %in% key_n], "yes", "no")
 knitr::kable(show, digits = 3, row.names = FALSE)
 ```
 
-Note: These four sample sizes are a sample of the picture: 1 is the raw population, 2 is the smallest amount of averaging, 5 is a small sample, and 30 is the classic rule of thumb. Every n from 1 to 100 appears in the diagnostics chart below and in `results/01_normal.csv`, and you can watch any n live in the **Interactive Sampling Distribution Explorer**
+Note: These four sample sizes are a sample of the picture: 1 is the raw population, 2 is the smallest amount of averaging, 5 is a small sample, and 30 is the classic rule of thumb. Every n from 1 to 100 appears in the diagnostics chart below and in `results/01_normal.csv`, and you can see the sampling distribution at any n in the [Interactive Sampling Distribution Explorer](https://nprodhuturi.github.io/clt-monte-carlo/interactive/explorer.html).
 
 ## 5. Plots
 
@@ -147,5 +147,7 @@ max_mean_err <- max(abs(results$sim_mean - results$theory_mean))
 ## 8. Selected n and justification
 
 **Selected n = `r n_star`.**
+
+$$\boxed{n = `r n_star`}$$
 
 The sampling distribution of the mean is normal already at n = 1, and it passes all four of my criteria at every sample size I tested (n = `r min(n_values)` to `r max(n_values)`). So for a Normal population the answer to "how big must n be?" is that there is no minimum, and the number 30 plays no role.

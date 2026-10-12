@@ -60,6 +60,8 @@ plot_histograms <- function(all_means, n_show, pop_mean, pop_sd, label, step = N
   
   for (n in n_show) {
     means <- all_means[, as.character(n)]
+    mean_n <- if (length(pop_mean) > 1) pop_mean[as.character(n)] else pop_mean
+    sd_n   <- if (length(pop_sd) > 1) pop_sd[as.character(n)] else pop_sd
     if (is.null(step)) {
       breaks <- 35
     } else {
@@ -68,14 +70,16 @@ plot_histograms <- function(all_means, n_show, pop_mean, pop_sd, label, step = N
       breaks <- seq(min(means) - w / 2, max(means) + k * w, by = k * w)
     }
     h <- hist(means, breaks = breaks, plot = FALSE)
-    top <- max(h$density, dnorm(pop_mean, pop_mean, pop_sd / sqrt(n)), na.rm = TRUE)
+    top <- max(h$density, dnorm(mean_n, mean_n, sd_n / sqrt(n)), na.rm = TRUE)
     plot(h, freq = FALSE, ylim = c(0, top * 1.05),
          col = "gray85", border = "white",
          main = paste(label, "\nn =", n), xlab = "Sample mean")
-    curve(dnorm(x, mean = pop_mean, sd = pop_sd / sqrt(n)),
+    curve(dnorm(x, mean = mean_n, sd = sd_n / sqrt(n)),
           add = TRUE, col = "firebrick", lwd = 3)
   }
 }
+
+
 
 plot_qq <- function(all_means, n_show, label) {
   old_par <- par(mfrow = c(1, length(n_show)))

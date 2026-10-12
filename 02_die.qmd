@@ -1,5 +1,5 @@
 ---
-title: "CLT Project 02: Six-Sided Die"
+title: "CLT Distribution 02: Six-Sided Die"
 format:
   gfm:
     fig-width: 10
@@ -88,7 +88,7 @@ plot_histograms(all_means, show_n, mu, sigma, "Six-sided die", step = 1)
 plot_qq(all_means, show_n, "Six-sided die")
 ```
 
-These sample sizes are a sample of the picture: 1 is the raw population, 2 is the smallest amount of averaging, 5 is a small sample, 30 is the classic rule of thumb, and the last one is my selected n. Every n from 1 to 100 appears in the diagnostics chart below and in `results/02_die.csv`, and you can watch any n live in the **Interactive Sampling Distribution Explorer**
+These sample sizes are a sample of the picture: 1 is the raw population, 2 is the smallest amount of averaging, 5 is a small sample, 30 is the classic rule of thumb, and the last one is my selected n. Every n from 1 to 100 appears in the diagnostics chart below and in `results/02_die.csv`, and you can see the sampling distribution at any n in the [Interactive Sampling Distribution Explorer](https://nprodhuturi.github.io/clt-monte-carlo/interactive/explorer.html).
 
 **Diagnostics across every n.** Dashed lines mark my "approximately normal" limits (defined in section 6):
 
@@ -151,7 +151,7 @@ kurt_gap <- max(abs(results$excess_kurtosis - kappa / results$n))
 
 ## 8. Selected n and justification
 
-**Selected n = `r n_star`.**
+**Selected n=n_star**$$\boxed{n = `r n_star`}$$
 
 - **Evidence at n = `r n_star`.** Skewness `r round(at_star$skewness, 3)` (limit ±0.25), excess kurtosis `r round(at_star$excess_kurtosis, 3)` (limit ±0.5), and SD ratio `r round(at_star$sd_ratio, 3)` (limit 1 ± 0.05). The histogram follows the normal curve, and the Q–Q plot follows the line apart from small steps caused by the die's discrete values.
 - **Why not smaller.** At n = `r n_star - 1`, the excess kurtosis is `r round(below$excess_kurtosis, 3)`, outside my ±0.5 limit.

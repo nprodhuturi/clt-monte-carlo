@@ -1,4 +1,4 @@
-# CLT Project 01: Standard Normal
+# CLT Distribution 01: Standard Normal
 
 
 > **How to read this file.** Section 3 runs the simulation, sections 4
@@ -80,7 +80,9 @@ Note: These four sample sizes are a sample of the picture: 1 is the raw
 population, 2 is the smallest amount of averaging, 5 is a small sample,
 and 30 is the classic rule of thumb. Every n from 1 to 100 appears in
 the diagnostics chart below and in `results/01_normal.csv`, and you can
-watch any n live in the **Interactive Sampling Distribution Explorer**
+see the sampling distribution at any n in the [Interactive Sampling
+Distribution
+Explorer](https://nprodhuturi.github.io/clt-monte-carlo/interactive/explorer.html).
 
 ## 5. Plots
 
@@ -184,6 +186,8 @@ a little, not the conclusion.
 ## 8. Selected n and justification
 
 **Selected n = 1.**
+
+$$\boxed{n = 1}$$
 
 The sampling distribution of the mean is normal already at n = 1, and it
 passes all four of my criteria at every sample size I tested (n = 1 to

@@ -1,4 +1,4 @@
-# CLT Project 02: Six-Sided Die
+# CLT Distribution 02: Six-Sided Die
 
 
 > **How to read this file.** Section 3 runs the simulation, sections 4
@@ -116,8 +116,9 @@ These sample sizes are a sample of the picture: 1 is the raw population,
 2 is the smallest amount of averaging, 5 is a small sample, 30 is the
 classic rule of thumb, and the last one is my selected n. Every n from 1
 to 100 appears in the diagnostics chart below and in
-`results/02_die.csv`, and you can watch any n live in the **Interactive
-Sampling Distribution Explorer**
+`results/02_die.csv`, and you can see the sampling distribution at any n
+in the [Interactive Sampling Distribution
+Explorer](https://nprodhuturi.github.io/clt-monte-carlo/interactive/explorer.html).
 
 **Diagnostics across every n.** Dashed lines mark my “approximately
 normal” limits (defined in section 6):
@@ -202,7 +203,7 @@ histograms and Q–Q plots look blocky there.
 
 ## 8. Selected n and justification
 
-**Selected n = 3.**
+**Selected n=n_star**$$\boxed{n = 3}$$
 
 - **Evidence at n = 3.** Skewness -0.004 (limit ±0.25), excess kurtosis
   -0.405 (limit ±0.5), and SD ratio 0.998 (limit 1 ± 0.05). The

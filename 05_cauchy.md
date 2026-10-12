@@ -1,0 +1,245 @@
+# CLT Distribution 5: Cauchy
+
+
+> **How to read this file.** Section 3 runs the simulation, sections 4
+> and 5 show the evidence, and section 8 states my selected n. The
+> reusable code lives in `R/functions.R`; this file only calls it. This
+> is the one population where the CLT does not apply, so a few parts
+> look different from the others.
+
+## 1. Prediction
+
+The Cauchy has such heavy tails that it has **no mean and no standard
+deviation**. The CLT needs a finite variance, so I predict it fails:
+averaging more observations will not make the sample mean more normal,
+and it will not even make it more concentrated. I predict that no sample
+size passes my rule.
+
+## 2. The population
+
+``` r
+source("R/setup.R")
+source("R/functions.R")
+
+generator <- function(n) rcauchy(n, location = 0, scale = 1)
+```
+
+Cauchy(0, 1) has a bell-like center but extremely heavy tails. Its mean
+μ and standard deviation σ **do not exist** (the integrals diverge), so
+there is no theoretical standard error σ/√n to compare with. Two things
+I can say exactly:
+
+- The **median is 0** and the middle half of the values lies between −1
+  and 1, so the interquartile range is 2.
+- The average of n independent Cauchy(0, 1) values is **again exactly
+  Cauchy(0, 1)**, for every n. Averaging does nothing to the shape.
+
+``` r
+curve(dcauchy(x), from = -8, to = 8, lwd = 3, col = "steelblue",
+      main = "Cauchy(0, 1) population (black: normal for comparison)",
+      xlab = "x", ylab = "density")
+curve(dnorm(x), add = TRUE, lty = 2)
+```
+
+![](05_cauchy_files/figure-commonmark/population-plot-1.png)
+
+## 3. Simulation
+
+For every sample size n in my list (1 to 100, 44 sizes), I draw B =
+10,000 samples of n observations and keep each sample’s mean. B is the
+number of repetitions; n is the size of each sample.
+
+Because σ doesn’t exist, I pass `NA` for the theoretical mean and SD.
+That makes the SD-ratio check impossible to pass, so my rule can never
+select an n. I add two measures that **do** exist for the Cauchy: the
+interquartile range (IQR) of the sample means, and the share of sample
+means beyond ±10.
+
+``` r
+all_means <- simulate_all_n(generator, n_values)
+results   <- summarize_means(all_means, NA, NA)
+results$good <- flag_good(results)
+n_star <- smallest_good_n(results)
+
+results$median   <- apply(all_means, 2, median)
+results$iqr      <- apply(all_means, 2, IQR)
+results$beyond10 <- apply(all_means, 2, function(x) mean(abs(x) > 10))
+
+dir.create("results", showWarnings = FALSE)
+write.csv(results, "results/05_cauchy.csv", row.names = FALSE)
+```
+
+## 4. Results
+
+Selected sample sizes (the full table of all 44 sizes is saved in
+`results/05_cauchy.csv`). For a Cauchy(0, 1), the theory says the median
+is 0, the IQR is 2, and the share beyond ±10 is 0.063, **at every n**:
+
+``` r
+key_n <- c(1, 2, 5, 10, 20, 30, 50, 100)
+show  <- results[results$n %in% key_n, c("n", "median", "iqr", "beyond10",
+                                         "sim_mean", "sim_sd", "skewness",
+                                         "excess_kurtosis")]
+knitr::kable(show, digits = 3, row.names = FALSE)
+```
+
+|   n | median |   iqr | beyond10 | sim_mean |   sim_sd | skewness | excess_kurtosis |
+|----:|-------:|------:|---------:|---------:|---------:|---------:|----------------:|
+|   1 |  0.001 | 2.049 |    0.061 |   -2.621 |  230.839 |  -81.419 |        7460.255 |
+|   2 | -0.010 | 1.990 |    0.063 |   -0.259 |   29.803 |   -0.780 |        1344.752 |
+|   5 |  0.027 | 1.978 |    0.062 |    1.364 |   55.741 |   48.539 |        3364.385 |
+|  10 |  0.007 | 2.000 |    0.066 |    0.427 |   51.598 |    7.418 |         934.061 |
+|  20 | -0.003 | 2.031 |    0.064 |   -1.771 |  436.458 |  -54.251 |        6244.116 |
+|  30 | -0.004 | 2.029 |    0.064 |  -23.416 | 2214.813 |  -99.636 |        9947.571 |
+|  50 | -0.004 | 1.918 |    0.063 |    2.713 |  165.855 |   57.334 |        3554.253 |
+| 100 |  0.013 | 1.993 |    0.063 |   -0.696 |  111.872 |  -52.836 |        5188.126 |
+
+## 5. Plots
+
+The sample means from a Cauchy include a few gigantic values, so a
+normal histogram would be one thin spike. I zoom in on −10 to 10 and say
+so. The red curve is the **true** distribution of the sample mean
+(Cauchy(0, 1), which does not change with n). The dashed blue curve is
+what the CLT would predict if σ were 1: a normal curve that gets
+narrower like 1/√n.
+
+``` r
+show_n <- c(1, 2, 5, 30, 100)
+par(mfrow = c(1, length(show_n)))
+for (n in show_n) {
+  means <- all_means[, as.character(n)]
+  h <- hist(means[abs(means) < 10], breaks = seq(-10, 10, by = 0.5), plot = FALSE)
+  h$density <- h$counts / (B * 0.5)
+  plot(h, freq = FALSE, ylim = c(0, 0.45), col = "gray85", border = "white",
+       main = paste("Cauchy(0, 1)\nn =", n), xlab = "Sample mean (zoomed)")
+  curve(dcauchy(x), add = TRUE, col = "firebrick", lwd = 3)
+  curve(dnorm(x, 0, 1 / sqrt(n)), add = TRUE, col = "steelblue", lwd = 2, lty = 2)
+}
+```
+
+![](05_cauchy_files/figure-commonmark/histograms-1.png)
+
+``` r
+par(mfrow = c(1, 1))
+```
+
+**Q–Q plots** (points on the red line = normal). Here the y-axis is
+zoomed to −10 to 10, and the extreme points fly off the chart at every
+n:
+
+``` r
+par(mfrow = c(1, length(show_n)))
+for (n in show_n) {
+  means <- all_means[, as.character(n)]
+  qqnorm(means, ylim = c(-10, 10), main = paste("Cauchy Q-Q plot\nn =", n))
+  qqline(means, col = "firebrick", lwd = 2)
+}
+```
+
+![](05_cauchy_files/figure-commonmark/qqplots-1.png)
+
+``` r
+par(mfrow = c(1, 1))
+```
+
+You can try any n yourself in the [Interactive Sampling Distribution
+Explorer](https://nprodhuturi.github.io/clt-monte-carlo/interactive/explorer.html).
+
+**Diagnostics across every n.** Unlike the other populations, there is
+no theory line to approach. The left chart shows the IQR of the sample
+means, which should shrink if averaging helped; the middle chart shows
+the share of sample means beyond ±10, which should go to 0 if averaging
+helped; the right chart shows the simulated SD, which is meaningless for
+a Cauchy:
+
+``` r
+par(mfrow = c(1, 3))
+plot(results$n, results$iqr, type = "b", pch = 16, cex = 0.6, ylim = c(0, 3),
+     xlab = "n", ylab = "IQR of sample means", main = "Spread (IQR)")
+abline(h = 2, lty = 2, col = "firebrick")
+
+plot(results$n, results$beyond10, type = "b", pch = 16, cex = 0.6, ylim = c(0, 0.15),
+     xlab = "n", ylab = "share beyond +/-10", main = "Extreme sample means")
+abline(h = 1 - 2 * atan(10) / pi, lty = 2, col = "firebrick")
+
+plot(results$n, results$sim_sd, type = "b", pch = 16, cex = 0.6, log = "y",
+     xlab = "n", ylab = "simulated SD (log scale)", main = "Simulated SD (not meaningful)")
+```
+
+![](05_cauchy_files/figure-commonmark/diagnostics-1.png)
+
+## 6. My definition of “approximately normal”
+
+I use the same rule in every analysis. A sample size n counts as
+approximately normal when **all four** of these hold:
+
+1.  The histogram is bell-shaped and the Q–Q plot is close to the line.
+2.  \|skewness\| ≤ 0.25.
+3.  \|excess kurtosis\| ≤ 0.5.
+4.  The simulated SD is within 5% of the theoretical SE (σ/√n).
+
+My selected n is the smallest n that passes and stays passing for every
+larger n I tested. The reasons for each cutoff are in
+[01_standard_normal.md](01_standard_normal.md). For the Cauchy, check 4
+cannot be evaluated because σ does not exist, so I judge it with the
+pictures and the IQR instead.
+
+## 7. Interpretation
+
+``` r
+iqr_lo   <- min(results$iqr)
+iqr_hi   <- max(results$iqr)
+b_lo     <- min(results$beyond10)
+b_hi     <- max(results$beyond10)
+sd_1     <- results$sim_sd[results$n == 1]
+sd_big   <- max(results$sim_sd)
+sd_100   <- results$sim_sd[results$n == 100]
+```
+
+- **Shape.** At every n the histogram looks like the same peaked Cauchy
+  curve (red) and never like the narrowing normal curve (dashed blue).
+  The Q–Q plots have the same S-shape at n = 1 and n = 100, with extreme
+  points far off the line.
+- **Spread.** The IQR of the sample means stays between 1.91 and 2.07
+  for every n (theory: exactly 2). A normal average would shrink like
+  1/√n, so at n = 100 the IQR would be about 0.13. It does not shrink at
+  all.
+- **Extreme values.** The share of sample means beyond ±10 stays between
+  0.058 and 0.07 for every n (theory: 0.063). Averaging does not make
+  big values rarer.
+- **Mean and SD.** The simulated SD is 230.8 at n = 1 and 111.9 at n =
+  100, and its largest value is 4561.7. It jumps around and does not
+  settle, because it is dominated by whatever extreme value was drawn.
+  The simulated mean is also unstable for the same reason. These numbers
+  describe the random extremes, not a real mean or SD.
+- **Skewness and kurtosis.** The simulated skewness and kurtosis are
+  also erratic, so I do not use them as evidence here. The IQR and
+  tail-share results above are cleaner.
+
+**CLT assumptions.** The CLT needs a finite variance. The Cauchy has
+none (not even a mean), so the assumption fails, and the conclusion
+fails with it.
+
+**Limitations / surprises.** The surprise is that more data does not
+help at all: an average of 100 Cauchy values is just as wild as a single
+one. A rule that depends on σ (like mine) cannot even be run, so I used
+the IQR and the tail share instead. The limitation of those two measures
+is that they check spread and tails but not every part of the shape. The
+exact result (the mean of n Cauchy(0, 1) values is Cauchy(0, 1)) is the
+real reason the answer is no.
+
+## 8. Selected n and justification
+
+**Selected n = none** (no tested n passes).
+
+\$\$\boxed{\text{no } n \text{ works}}\$\$
+
+- **Evidence.** The IQR stays near 2 (1.91 to 2.07) instead of
+  shrinking, and the share beyond ±10 stays near 0.063. The histogram
+  never narrows toward the dashed normal curve, and the Q–Q plots never
+  straighten.
+- **Why no n.** The sample mean of n Cauchy(0, 1) values is exactly
+  Cauchy(0, 1), so no sample size, however large, makes it normal.
+- **Is the number 30?** No, and neither is 300 or 3,000. For the Cauchy
+  the answer is that **no number works**, because the CLT assumption of
+  finite variance is broken.

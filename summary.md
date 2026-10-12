@@ -1,0 +1,168 @@
+# Summary and Conclusions
+
+
+> This page compares all of my populations. Every number in it is read
+> from the results files (`results/*.csv`) that the individual analyses
+> save, so it updates when I re-run them. The reusable code lives in
+> `R/functions.R`. Each population has its own page (`01_...md` to
+> `06_...md`), and you can try any n yourself in the [Interactive
+> Sampling Distribution
+> Explorer](https://nprodhuturi.github.io/clt-monte-carlo/interactive/explorer.html).
+
+## 1. What I investigated
+
+The Central Limit Theorem (CLT) says that the average of many
+independent observations is approximately normal. The question is **how
+many is “many”**, and a common rule of thumb says n = 30. I tested this
+with a **Monte Carlo simulation**: for each population and each sample
+size n, I repeated the same experiment 10,000 times (B = 10,000
+repetitions). In each repetition I drew a sample of n observations and
+recorded its mean. The 10,000 sample means approximate the sampling
+distribution of the mean, and I measured how close to normal it is using
+histograms, Q–Q plots, skewness, excess kurtosis, and a comparison of
+the simulated standard error with the theoretical σ/√n. I did this for
+every n from 1 to 40 and for n = 45, 50, 75 and 100.
+
+I called a sample size **approximately normal** when all four of these
+hold (defended in [01_standard_normal.md](01_standard_normal.md)):
+
+1.  The histogram is bell-shaped and the Q–Q plot is close to the line.
+2.  \|skewness\| ≤ 0.25.
+3.  \|excess kurtosis\| ≤ 0.5.
+4.  The simulated standard error is within 5% of the theoretical σ/√n.
+
+My answer for each population is the **smallest n that passes and stays
+passing** for every larger n I tested.
+
+## 2. Summary table
+
+| Population | Smallest n judged normal | Skewness at that n | Excess kurtosis at that n | SD ratio at that n | Key observation |
+|:---|:---|:---|:---|:---|:---|
+| Standard Normal | 1 | -0.025 | -0.025 | 0.998 | Already normal at every n (my control case). |
+| Six-sided die | 3 | -0.004 | -0.405 | 0.998 | Symmetric, but flat-topped: light tails (kurtosis) held it back. |
+| Exponential(1) | 75 | 0.208 | 0.067 | 0.992 | Strongly skewed, so skewness decays slowly. 30 is not enough. |
+| Binomial(5, 0.10) | 29 | 0.223 | -0.053 | 1.001 | Skewed and discrete; about 30. |
+| Cauchy(0, 1) | none | \- | \- | \- | Mean of n Cauchy values is Cauchy again, so no n works. |
+| Non-identical Bernoulli | 12 | -0.245 | -0.045 | 1.007 | Changing probabilities barely mattered: almost the same as a constant 0.70. |
+
+The SD ratio is the simulated standard error divided by the theoretical
+σ/√n, so 1 means a perfect match. The Cauchy has no σ, so its row has no
+values.
+
+## 3. Larger research questions
+
+### 3.1 Is there a universal rule such as n = 30?
+
+**No.** Across the populations where the CLT works, the selected n runs
+from 1 to 75, and for the Cauchy there is no n at all. Of the 5
+populations that reach approximate normality, 4 need fewer than 30
+observations (so 30 is wasteful) and 1 needs more than 30 (so 30 is not
+enough). The Cauchy never works. So n = 30 is **too many for some, too
+few for others, and not helpful for heavy tails**. What matters is the
+shape of the population, not a fixed number.
+
+### 3.2 Which populations converged fastest and slowest, and why?
+
+**Fastest:** the Normal (n = 1) and the die (n = 3). The Normal is
+already normal. The die is symmetric and has no long tail, so it only
+needed a little averaging to fix its flat top.
+
+**Slowest (among those that converge):** the Exponential (n = 75). **It
+never converges at all for the Cauchy.**
+
+**Why:** the sample mean’s skewness shrinks like the population skewness
+divided by √n. A skewed population needs n large enough to push that
+below my 0.25 limit:
+
+| Population | Population skewness (n = 1 row) | Predicted n from skewness alone | Selected n |
+|:---|---:|---:|---:|
+| Standard Normal | -0.03 | 1 | 1 |
+| Six-sided die | 0.00 | 1 | 3 |
+| Exponential(1) | 2.02 | 66 | 75 |
+| Binomial(5, 0.10) | 1.22 | 24 | 29 |
+
+The predicted n is (population skewness / 0.25)². It is close to the
+selected n for the skewed populations (Exponential, Binomial). For the
+die, which has no skewness at all, it predicts 1 but the selected n is
+larger, because light tails (kurtosis) decided it instead. So **the more
+skewed the population, the larger n needs to be**, and symmetric
+populations converge fastest.
+
+### 3.3 Assumptions
+
+The CLT has assumptions: the observations should be independent, come
+from the same distribution, and have a finite variance. I broke each of
+them to see what happens.
+
+**Observations that are not identically distributed (file 06).** In the
+basketball example, the chance of making a shot fell from 0.90 to 0.50
+during the game, so the shots were not identical. The CLT still worked.
+The selected n was 12, almost the same as the 14 I got for a shooter
+with a constant 0.70 chance. The one thing I had to change was the
+formulas for the mean and standard error, because every shot has its own
+probability. So being identically distributed is not strictly needed,
+but independence still is.
+
+**Extremely heavy tails (file 05).** The Cauchy has no mean and no
+variance, and the CLT failed completely. The IQR (the spread of the
+middle half) of the sample means stayed between about 1.9 and 2.1 at
+every n, when the theory says it is exactly 2. The share of sample means
+beyond ±10 also stayed near 0.063 at every n. Averaging 100 Cauchy
+values was no better than using one value. So a finite variance is not a
+small technical detail; the CLT depends on it.
+
+**Dependent observations.**
+`I did not complete a dependent-observation analysis in this project, so I cannot report a result for it. The standard error formula σ/√n assumes independence; with positive dependence the averages vary more than σ/√n predicts, so more observations are needed."`
+
+## 4. How sensitive are the answers to my cutoffs?
+
+My rule of \|skewness\| ≤ 0.25 and \|excess kurtosis\| ≤ 0.5 is a
+judgment call. To see how much it matters, I re-apply the same
+simulation results with a stricter and a looser rule (no new
+simulation):
+
+| Population | Stricter (0.10 / 0.25) | My rule (0.25 / 0.5) | Looser (0.5 / 1.0) |
+|:---|:---|:---|:---|
+| Standard Normal | 1 | 1 | 1 |
+| Six-sided die | 5 | 3 | 2 |
+| Exponential(1) | \> 100 | 75 | 18 |
+| Binomial(5, 0.10) | \> 100 | 29 | 7 |
+| Cauchy(0, 1) | none | none | none |
+| Non-identical Bernoulli | 45 | 12 | 2 |
+
+The columns give the skewness limit / kurtosis limit. A stricter rule
+needs larger n, and a looser rule needs smaller n, but the **ranking
+stays about the same**: the Normal is always fastest, the skewed
+populations (Exponential and Binomial) are always the slowest, and the
+Cauchy never passes. So the main conclusion does not depend on my exact
+cutoffs, but the exact n values do. The “\> 100” entries mean the rule
+is not met by n = 100, the largest I tested.
+
+## 5. Overall conclusions
+
+1.  **There is no universal n.** The number needed ranged from 1 to 75
+    for populations where the CLT works, and was undefined for the
+    Cauchy. n = 30 is a rough guide, not a law.
+2.  **Skewness is the main driver.** The more skewed the population, the
+    larger n has to be, and the relationship roughly follows (skewness /
+    0.25)². Symmetric populations converge fastest.
+3.  **The standard error formula σ/√n works at every n,** even when the
+    shape is far from normal: the simulated SD divided by the
+    theoretical SE stayed between 0.98 and 1.02 in every population that
+    has a σ. The CLT is about the *shape*, not the spread.
+4.  **Assumptions matter.** Identical distribution can be relaxed (file
+    06). Finite variance cannot be (file 05). Independence is needed for
+    the formulas I used.
+5.  **“Normal enough” is a decision.** Stricter or looser cutoffs move
+    the selected n, so every answer comes with the rule that produced
+    it.
+
+## 6. How this repository is organized
+
+- `01_...` to `06_...`: one analysis per population (`.qmd` source,
+  `.md` page, `_files` pictures).
+- `R/setup.R` and `R/functions.R`: the shared settings (seed 8120, B =
+  10,000, the n list) and the reusable functions.
+- `results/`: the saved numbers for every population.
+- `interactive/explorer.html`: the interactive page (also linked above).
+- `ai_prompts.md`: my record of how I used AI.
