@@ -207,7 +207,8 @@ rough answer and not an exact one.
 
 ## 8. Selected n and justification
 
-**Selected n = 29.**
+| **Final answer: n = 29** |
+|:------------------------:|
 
 $$\boxed{n = 29}$$
 

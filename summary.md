@@ -164,5 +164,6 @@ is not met by n = 100, the largest I tested.
 - `R/setup.R` and `R/functions.R`: the shared settings (seed 8120, B =
   10,000, the n list) and the reusable functions.
 - `results/`: the saved numbers for every population.
-- `interactive/explorer.html`: the interactive page (also linked above).
+- `interactive/explorer.html`: the interactive page (also linked in
+  README).
 - `ai_prompts.md`: my record of how I used AI.

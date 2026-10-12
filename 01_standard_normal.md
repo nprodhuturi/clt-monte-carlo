@@ -103,8 +103,8 @@ plot_qq(all_means, c(1, 2, 5, 30), "Standard Normal")
 
 ![](01_standard_normal_files/figure-commonmark/qqplots-1.png)
 
-**Diagnostics across every n.** Dashed lines mark my “good enough”
-limits (defined in section 6):
+**Diagnostics across every n.** Dashed lines mark my “approximately
+normal” limits (defined in section 6):
 
 ``` r
 par(mfrow = c(1, 3))
@@ -185,7 +185,8 @@ a little, not the conclusion.
 
 ## 8. Selected n and justification
 
-**Selected n = 1.**
+| **Final answer: n = 1** |
+|:-----------------------:|
 
 $$\boxed{n = 1}$$
 

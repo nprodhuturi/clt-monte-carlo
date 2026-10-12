@@ -160,9 +160,10 @@ sd_100   <- results$sim_sd[results$n == 100]
 
 ## 8. Selected n and justification
 
-**Selected n = none** (`r if (is.na(n_star)) "no tested n passes" else n_star`).
+| **Final answer: no n works** |
+|:----------------------------:|
 
-\$\$\\boxed{\\text{no } n \\text{ works}}\$\$
+$$\boxed{\text{no } n \text{ works}}$$
 
 - **Evidence.** The IQR stays near 2 (`r round(iqr_lo, 2)` to `r round(iqr_hi, 2)`) instead of shrinking, and the share beyond ±10 stays near `r round(1 - 2 * atan(10) / pi, 3)`. The histogram never narrows toward the dashed normal curve, and the Q–Q plots never straighten.
 - **Why no n.** The sample mean of n Cauchy(0, 1) values is exactly Cauchy(0, 1), so no sample size, however large, makes it normal.

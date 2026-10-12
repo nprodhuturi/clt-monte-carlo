@@ -197,13 +197,15 @@ so I treat n = 75 as a rough answer and not an exact one.
 
 ## 8. Selected n and justification
 
-**Selected n = 75.**
+| **Final answer: n = 75** |
+|:------------------------:|
 
 $$\boxed{n = 75}$$
 
-- **Evidence at n = 75.** Skewness 0.208 (limit ±0.25), excess kurtosis
-  0.067 (limit ±0.5), and SD ratio 0.992 (limit 1 ± 0.05). The histogram
-  follows the normal curve closely, and the Q–Q plot follows the line.
+**Evidence at n = 75.** Skewness 0.208 (limit ±0.25), excess kurtosis
+0.067 (limit ±0.5), and SD ratio 0.992 (limit 1 ± 0.05). The histogram
+follows the normal curve closely, and the Q–Q plot follows the line.
+
 - **Why not smaller.** At n = 50, the skewness is 0.252, which is
   outside my ±0.25 limit (the theory says it should be about 0.283).
 - **It stays passing.** Every larger n I tested, up to n = 100, also

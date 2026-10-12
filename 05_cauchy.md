@@ -230,9 +230,10 @@ real reason the answer is no.
 
 ## 8. Selected n and justification
 
-**Selected n = none** (no tested n passes).
+| **Final answer: no n works** |
+|:----------------------------:|
 
-\$\$\boxed{\text{no } n \text{ works}}\$\$
+$$\boxed{\text{no } n \text{ works}}$$
 
 - **Evidence.** The IQR stays near 2 (1.91 to 2.07) instead of
   shrinking, and the share beyond ±10 stays near 0.063. The histogram

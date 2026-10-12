@@ -267,7 +267,8 @@ situation.
 
 ## 8. Selected n and justification
 
-**Selected n = 12.**
+| **Final answer: n = 12** |
+|:------------------------:|
 
 $$\boxed{n = 12}$$
 

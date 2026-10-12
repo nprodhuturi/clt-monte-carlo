@@ -151,7 +151,10 @@ kurt_gap <- max(abs(results$excess_kurtosis - kappa / results$n))
 
 ## 8. Selected n and justification
 
-**Selected n=n_star**$$\boxed{n = `r n_star`}$$
+| **Final answer: n = `r n_star`** |
+|:--------------------------------:|
+
+$$\boxed{n = `r n_star`}$$
 
 - **Evidence at n = `r n_star`.** Skewness `r round(at_star$skewness, 3)` (limit ±0.25), excess kurtosis `r round(at_star$excess_kurtosis, 3)` (limit ±0.5), and SD ratio `r round(at_star$sd_ratio, 3)` (limit 1 ± 0.05). The histogram follows the normal curve, and the Q–Q plot follows the line apart from small steps caused by the die's discrete values.
 - **Why not smaller.** At n = `r n_star - 1`, the excess kurtosis is `r round(below$excess_kurtosis, 3)`, outside my ±0.5 limit.

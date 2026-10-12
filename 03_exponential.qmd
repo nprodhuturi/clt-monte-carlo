@@ -148,11 +148,13 @@ n_theory <- ceiling((2 / 0.25)^2)
 
 ## 8. Selected n and justification
 
-**Selected n = `r n_star`.**
+| **Final answer: n = `r n_star`** |
+|:--------------------------------:|
 
 $$\boxed{n = `r n_star`}$$
 
-- **Evidence at n = `r n_star`.** Skewness `r round(at_star$skewness, 3)` (limit ±0.25), excess kurtosis `r round(at_star$excess_kurtosis, 3)` (limit ±0.5), and SD ratio `r round(at_star$sd_ratio, 3)` (limit 1 ± 0.05). The histogram follows the normal curve closely, and the Q–Q plot follows the line.
+**Evidence at n = `r n_star`.** Skewness `r round(at_star$skewness, 3)` (limit ±0.25), excess kurtosis `r round(at_star$excess_kurtosis, 3)` (limit ±0.5), and SD ratio `r round(at_star$sd_ratio, 3)` (limit 1 ± 0.05). The histogram follows the normal curve closely, and the Q–Q plot follows the line.
+
 - **Why not smaller.** At n = `r below$n`, the skewness is `r round(below$skewness, 3)`, which is outside my ±0.25 limit (the theory says it should be about `r round(2 / sqrt(below$n), 3)`).
 - **It stays passing.** Every larger n I tested, up to n = `r max(n_values)`, also passes.
 - **Is the number 30?** No. For the Exponential, 30 is too small: at n = 30 the skewness is still about `r round(results$skewness[results$n == 30], 2)`. By the theory I need about n = `r n_theory`, so 30 is roughly `r round(n_star / 30, 1)` times too small.

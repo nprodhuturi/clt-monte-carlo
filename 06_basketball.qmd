@@ -189,7 +189,8 @@ max_mean_err <- max(abs(results$sim_mean - results$theory_mean))
 
 ## 8. Selected n and justification
 
-**Selected n = `r n_star`.**
+| **Final answer: n = `r n_star`** |
+|:--------------------------------:|
 
 $$\boxed{n = `r n_star`}$$
 

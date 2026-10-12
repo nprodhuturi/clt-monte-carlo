@@ -203,7 +203,10 @@ histograms and Q–Q plots look blocky there.
 
 ## 8. Selected n and justification
 
-**Selected n=n_star**$$\boxed{n = 3}$$
+| **Final answer: n = 3** |
+|:-----------------------:|
+
+$$\boxed{n = 3}$$
 
 - **Evidence at n = 3.** Skewness -0.004 (limit ±0.25), excess kurtosis
   -0.405 (limit ±0.5), and SD ratio 0.998 (limit 1 ± 0.05). The
