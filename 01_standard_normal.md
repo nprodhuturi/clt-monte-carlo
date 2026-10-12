@@ -1,0 +1,191 @@
+# CLT Project 01: Standard Normal
+
+
+> **How to read this file.** Section 3 runs the simulation, sections 4
+> and 5 show the evidence, and section 8 states my selected n. The
+> reusable code lives in `R/functions.R`; this file only calls it.
+
+## 1. Prediction
+
+> The population is already normal. I predict the sample mean is exactly
+> normal at **every** n, even n = 1, and that its spread shrinks like
+> 1/√n. For example, at n = 10 I expect the SD of the sample means to be
+> about 1 √10 ≈ 0.316, and skewness and kurtosis to be near 0 at every
+> n. This serves as a control so I can compare it to other distributions
+> that may not be normal at a given n.
+
+## 2. The population
+
+``` r
+source("R/setup.R")
+source("R/functions.R")
+
+generator <- function(n) rnorm(n, mean = 0, sd = 1)
+mu    <- 0
+sigma <- 1
+```
+
+Standard Normal: mean μ = 0, standard deviation σ = 1, so the
+theoretical standard error of the mean is SE = σ/√n = 1/√n.
+
+``` r
+curve(dnorm(x), from = -4, to = 4, lwd = 3, col = "steelblue",
+      main = "Standard Normal population", xlab = "x", ylab = "density")
+```
+
+![](01_standard_normal_files/figure-commonmark/population-plot-1.png)
+
+## 3. Simulation
+
+For every sample size n in my list (1 to 100, 44 sizes), I draw B =
+10,000 samples of n observations and keep each sample’s mean. B is the
+number of repetitions; n is the size of each sample.
+
+``` r
+all_means <- simulate_all_n(generator, n_values)
+results   <- summarize_means(all_means, mu, sigma)
+results$good <- flag_good(results)
+
+dir.create("results", showWarnings = FALSE)
+write.csv(results, "results/01_normal.csv", row.names = FALSE)
+```
+
+## 4. Results
+
+Selected sample sizes (the full table of all 44 sizes is saved in
+`results/01_normal.csv`):
+
+``` r
+key_n <- c(1, 2, 5, 10, 20, 30, 40, 50, 100)
+show  <- results[results$n %in% key_n, c("n", "sim_mean", "theory_mean", "sim_sd",
+                                         "theory_se", "sd_ratio", "skewness",
+                                         "excess_kurtosis")]
+show$passes <- ifelse(results$good[results$n %in% key_n], "yes", "no")
+knitr::kable(show, digits = 3, row.names = FALSE)
+```
+
+| n | sim_mean | theory_mean | sim_sd | theory_se | sd_ratio | skewness | excess_kurtosis | passes |
+|---:|---:|---:|---:|---:|---:|---:|---:|:---|
+| 1 | -0.008 | 0 | 0.998 | 1.000 | 0.998 | -0.025 | -0.025 | yes |
+| 2 | 0.006 | 0 | 0.707 | 0.707 | 1.000 | -0.010 | -0.047 | yes |
+| 5 | 0.000 | 0 | 0.448 | 0.447 | 1.002 | 0.024 | 0.017 | yes |
+| 10 | 0.002 | 0 | 0.316 | 0.316 | 0.999 | 0.018 | -0.021 | yes |
+| 20 | 0.002 | 0 | 0.223 | 0.224 | 0.996 | -0.008 | 0.066 | yes |
+| 30 | 0.001 | 0 | 0.183 | 0.183 | 1.001 | 0.040 | 0.025 | yes |
+| 40 | 0.000 | 0 | 0.158 | 0.158 | 1.001 | -0.043 | -0.091 | yes |
+| 50 | 0.000 | 0 | 0.143 | 0.141 | 1.009 | 0.012 | -0.066 | yes |
+| 100 | 0.000 | 0 | 0.100 | 0.100 | 1.000 | -0.011 | 0.011 | yes |
+
+Note: These four sample sizes are a sample of the picture: 1 is the raw
+population, 2 is the smallest amount of averaging, 5 is a small sample,
+and 30 is the classic rule of thumb. Every n from 1 to 100 appears in
+the diagnostics chart below and in `results/01_normal.csv`, and you can
+watch any n live in the **Interactive Sampling Distribution Explorer**
+
+## 5. Plots
+
+**Histograms of the sample means**, with the theoretical normal curve
+N(μ, σ/√n) in red:
+
+``` r
+plot_histograms(all_means, c(1, 2, 5, 30), mu, sigma, "Standard Normal")
+```
+
+![](01_standard_normal_files/figure-commonmark/histograms-1.png)
+
+**Q–Q plots** (points on the red line = normal):
+
+``` r
+plot_qq(all_means, c(1, 2, 5, 30), "Standard Normal")
+```
+
+![](01_standard_normal_files/figure-commonmark/qqplots-1.png)
+
+**Diagnostics across every n.** Dashed lines mark my “good enough”
+limits (defined in section 6):
+
+``` r
+par(mfrow = c(1, 3))
+plot(results$n, results$skewness, type = "b", pch = 16, cex = 0.6,
+     ylim = range(c(results$skewness, -0.25, 0.25)),
+     xlab = "n", ylab = "skewness", main = "Skewness of sample means")
+abline(h = c(-0.25, 0, 0.25), lty = c(2, 1, 2), col = "firebrick")
+
+plot(results$n, results$excess_kurtosis, type = "b", pch = 16, cex = 0.6,
+     ylim = range(c(results$excess_kurtosis, -0.5, 0.5)),
+     xlab = "n", ylab = "excess kurtosis", main = "Excess kurtosis")
+abline(h = c(-0.5, 0, 0.5), lty = c(2, 1, 2), col = "firebrick")
+
+plot(results$n, results$sd_ratio, type = "b", pch = 16, cex = 0.6,
+     ylim = range(c(results$sd_ratio, 0.95, 1.05)),
+     xlab = "n", ylab = "simulated SD / theoretical SE", main = "Spread vs. theory")
+abline(h = c(0.95, 1, 1.05), lty = c(2, 1, 2), col = "firebrick")
+```
+
+![](01_standard_normal_files/figure-commonmark/diagnostics-1.png)
+
+## 6. My definition of “approximately normal”
+
+For a sample size n to count as approximately normal, I require **all**
+of the following:
+
+1.  The histogram is bell-shaped and the Q–Q plot is close to the line.
+2.  \|skewness\| ≤ 0.25.
+3.  \|excess kurtosis\| ≤ 0.5.
+4.  The simulated SD is within 5% of the theoretical SE (σ/√n).
+
+My selected n is the smallest n that passes and stays passing for every
+larger n I tested, so a lucky pass at one n doesn’t count.
+
+**Why these cutoffs.**
+
+| Check | Cutoff | Why this number |
+|----|----|----|
+| Skewness | ±0.25 | A common rule of thumb calls \|skewness\| \< 0.5 “approximately symmetric,” and I use half of that. At 0.25, a normal-based 95% interval puts about 1.8% in one tail and 3.1% in the other instead of 2.5% each (checked with the exact Gamma distribution of the Exponential mean at n = 64). That is a visible but modest error. |
+| Excess kurtosis | ±0.5 | This is the tail weight of a t distribution with 16 degrees of freedom, whose 97.5% point is 2.12 versus 1.96 for the normal. That is already close to normal. |
+| SD vs. theory | within 5% | If the true SD is 5% off, an interval that claims 95% actually covers between 93.8% and 96.1%. |
+
+**Note**: This is my interpretation. A stricter or looser rule would
+change the selected n, which is why I state the rule openly and use it
+the same way in every analysis.
+
+## 7. Interpretation
+
+``` r
+n_star     <- smallest_good_n(results)
+max_skew   <- max(abs(results$skewness))
+max_kurt   <- max(abs(results$excess_kurtosis))
+sd_lo      <- min(results$sd_ratio)
+sd_hi      <- max(results$sd_ratio)
+max_mean_err <- max(abs(results$sim_mean - results$theory_mean))
+```
+
+- **Shape.** The histograms and Q–Q plots look normal at every n shown,
+  including n = 1. That makes sense: the average of normal observations
+  is exactly normal, so the CLT is not needed here.
+- **Mean.** The simulated mean never differs from μ = 0 by more than
+  0.008.
+- **Spread.** The simulated SD divides by the theoretical SE to between
+  0.984 and 1.017, so the formula σ/√n holds for every n.
+- **Skewness and kurtosis.** Across all 44 sizes, \|skewness\| never
+  exceeds 0.065 and \|excess kurtosis\| never exceeds 0.149. These are
+  not real non-normality; they are **simulation noise** from using
+  10,000 repetitions. So in the other populations I will treat skewness
+  within about ±0.07 and excess kurtosis within about ±0.15 as
+  “basically zero.”
+
+**CLT assumptions.** Observations are independent, identically
+distributed, and have finite variance, so every assumption is met.
+
+**Limitations / surprises.** The only wiggle in the results is random
+noise, and it is small. A different seed would shift those small wiggles
+a little, not the conclusion.
+
+## 8. Selected n and justification
+
+**Selected n = 1.**
+
+The sampling distribution of the mean is normal already at n = 1, and it
+passes all four of my criteria at every sample size I tested (n = 1 to
+100). So for a Normal population the answer to “how big must n be?” is
+that there is no minimum, and the number 30 plays no role.
