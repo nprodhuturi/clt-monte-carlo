@@ -121,7 +121,7 @@ tr.cur td{background:var(--fill-soft)}
       </div>
     </div>
     <div>
-      <span class="lab">My &ldquo;good enough&rdquo; cutoffs</span>
+      <span class="lab">My &ldquo;approximately normal&rdquo; cutoffs</span>
       <div class="limits">
         <div><label for="skewLim" style="text-transform:none;letter-spacing:0">|skew| &le;</label><input type="number" id="skewLim" value="0.25" step="0.05" min="0.01"></div>
         <div><label for="kurtLim" style="text-transform:none;letter-spacing:0">|kurt| &le;</label><input type="number" id="kurtLim" value="0.5" step="0.1" min="0.01"></div>
@@ -328,7 +328,7 @@ function renderVerdict(){
   if(!e.sOK) why.push('skewness '+fmt(m.skew,2)+' (limit '+L.s+')');
   if(!e.kOK) why.push('excess kurtosis '+fmt(m.kurt,2)+' (limit '+L.k+')');
   if(!e.rOK) why.push('SD ratio '+fmt(m.ratio,3)+' (needs '+(1-L.t).toFixed(2)+' to '+(1+L.t).toFixed(2)+')');
-  if(e.ok) v.innerHTML='<span class="vmark ok" aria-hidden="true">✓</span><div><b>n = '+n+' passes</b> all three of your cutoffs for '+pop.label+'. Check the histogram and Q&ndash;Q plot by eye too: bars on the curve, points on the line.</div>';
+  if(e.ok) v.innerHTML='<span class="vmark ok" aria-hidden="true">✓</span><div><b>n = '+n+' passes</b> all three of the cutoffs for '+pop.label+'. Check the histogram and Q&ndash;Q plot by eye too: bars on the curve, points on the line.</div>';
   else v.innerHTML='<span class="vmark no" aria-hidden="true">✕</span><div><b>n = '+n+' is not there yet.</b> Failing: '+why.join('; ')+'.</div>';
 }
 
@@ -376,8 +376,8 @@ function renderScan(){
   var sum=$("scanSum");
   if(!done) sum.innerHTML='Scanning n = 1 to '+NMAX+'&hellip; ('+res.length+' of '+NMAX+' done)';
   else if(pop.heavy) sum.innerHTML='<b>No n passes.</b> Even at n = '+NMAX+' the Cauchy means are as wild as at n = 1.';
-  else if(ns===null) sum.innerHTML='<b>No n up to '+NMAX+' passes and keeps passing</b> with your cutoffs for '+pop.label+'. It may need a larger n, or looser cutoffs.';
-  else sum.innerHTML='With your cutoffs, the smallest n that passes and keeps passing for '+pop.label+' is <b>n* = '+ns+'</b>.';
+  else if(ns===null) sum.innerHTML='<b>No n up to '+NMAX+' passes and keeps passing</b> with the cutoffs for '+pop.label+'. It may need a larger n, or looser cutoffs.';
+  else sum.innerHTML='With the cutoffs, the smallest n that passes and keeps passing for '+pop.label+' is <b>n* = '+ns+'</b>.';
   var rows='<tr><th>n</th><th>skewness</th><th>excess kurtosis</th><th>SD ratio</th><th>passes</th></tr>';
   res.forEach(function(r){ rows+='<tr'+(r.n===state.n?' class="cur"':'')+'><td>'+r.n+'</td><td>'+fmt(r.skew)+'</td><td>'+fmt(r.kurt)+'</td><td>'+fmt(r.ratio)+'</td><td>'+(evalM(r).ok?'yes':'no')+'</td></tr>'; });
   $("scanTable").innerHTML=rows;
